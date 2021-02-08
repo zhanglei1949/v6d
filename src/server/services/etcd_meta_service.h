@@ -103,7 +103,8 @@ class EtcdMetaService : public IMetaService {
   explicit EtcdMetaService(vs_ptr_t& server_ptr)
       : IMetaService(server_ptr),
         etcd_spec_(server_ptr_->GetSpec()["metastore_spec"]),
-        prefix_(etcd_spec_["prefix"].get_ref<std::string const&>()) {
+        prefix_(etcd_spec_["prefix"].get_ref<std::string const&>()),
+        lock_lease_ttl_(etcd_spec_["etcd_lock_ttl"].get<int32_t>()) {
     auto launcher = EtcdLauncher(etcd_spec_);
     VINEYARD_CHECK_OK(
         launcher.LaunchEtcdServer(etcd_, meta_sync_lock_, etcd_proc_));
@@ -143,6 +144,7 @@ class EtcdMetaService : public IMetaService {
 
   const json etcd_spec_;
   const std::string prefix_;
+  int32_t lock_lease_ttl_;
 
  private:
   std::unique_ptr<etcd::Client> etcd_;

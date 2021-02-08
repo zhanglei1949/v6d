@@ -74,7 +74,7 @@ void EtcdWatchHandler::operator()(etcd::Response const& resp) {
 void EtcdMetaService::requestLock(
     std::string lock_name,
     callback_t<std::shared_ptr<ILock>> callback_after_locked) {
-  etcd_->lock(prefix_ + lock_name)
+  etcd_->lock(prefix_ + lock_name, lock_lease_ttl_)
       .then([this, callback_after_locked](
                 pplx::task<etcd::Response> const& resp_task) {
         auto const& resp = resp_task.get();
